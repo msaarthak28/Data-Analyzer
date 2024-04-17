@@ -5,6 +5,8 @@ const cors = require("cors");
 app.use(express.json());
 app.use(cors());
 
+const PORT = process.env.PORT || 4000;
+
 const data = fs
   .readFileSync("./data/data.txt", "utf8")
   .split("\n")
@@ -153,6 +155,6 @@ app.get("/", (req, resp) => {
   resp.send("Welcome to analytics");
 });
 
-app.listen(2000, () => {
+app.listen(PORT, () => {
   console.log("app running at port 2000");
 });
