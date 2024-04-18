@@ -57,5 +57,6 @@ The API expects data in CSV format with the following columns: Date, SKU, Unit P
 
 ## Dependencies
 
+- Node.js
 - Express.js: For creating the RESTful API endpoints.
 - fs: For file system operations like reading data from a file.
