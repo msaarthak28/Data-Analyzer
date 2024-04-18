@@ -5,7 +5,7 @@ const cors = require("cors");
 app.use(express.json());
 app.use(cors());
 
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 2000;
 
 const data = fs
   .readFileSync("./data/data.txt", "utf8")
@@ -112,7 +112,8 @@ app.get("/highestRevenueItems", (req, res) => {
 });
 
 app.get("/mostPopularItemStats", (req, res) => {
-  const mostPopularItemStats = {};
+  const mostPopularItem = {};
+  const monthlyItemQuantities = {};
 
   formattedData.forEach((row) => {
     const date = new Date(row.Date);
@@ -120,35 +121,64 @@ app.get("/mostPopularItemStats", (req, res) => {
     const item = row.SKU;
     const quantity = parseInt(row.Quantity);
 
-    if (!mostPopularItemStats[month]) {
-      mostPopularItemStats[month] = {
-        item: "",
-        quantity: 0,
-        orders: [],
-      };
+    if (!monthlyItemQuantities[month]) {
+      monthlyItemQuantities[month] = {};
     }
 
-    if (quantity > mostPopularItemStats[month].quantity) {
-      mostPopularItemStats[month].item = item;
-      mostPopularItemStats[month].quantity = quantity;
-      mostPopularItemStats[month].orders = [quantity];
-    } else if (quantity === mostPopularItemStats[month].quantity) {
-      mostPopularItemStats[month].orders.push(quantity);
+    if (!monthlyItemQuantities[month][item]) {
+      monthlyItemQuantities[month][item] = [quantity];
+    } else {
+      monthlyItemQuantities[month][item].push(quantity);
+    }
+
+    let totalQuantity = 0;
+    for (const qty of monthlyItemQuantities[month][item]) {
+      totalQuantity += qty;
+    }
+
+    if (
+      !mostPopularItem[month] ||
+      totalQuantity > mostPopularItem[month].quantity
+    ) {
+      mostPopularItem[month] = {
+        item: item,
+        quantity: totalQuantity,
+      };
     }
   });
 
-  for (const month in mostPopularItemStats) {
-    const orders = mostPopularItemStats[month].orders;
-    const minOrders = Math.min(...orders);
-    const maxOrders = Math.max(...orders);
-    const avgOrders = orders.reduce((acc, val) => acc + val, 0) / orders.length;
-    mostPopularItemStats[month].minOrders = minOrders;
-    mostPopularItemStats[month].maxOrders = maxOrders;
-    mostPopularItemStats[month].avgOrders = avgOrders;
-    delete mostPopularItemStats[month].orders;
+  const result = {};
+
+  for (const month in mostPopularItem) {
+    const item = mostPopularItem[month].item;
+    const quantities = monthlyItemQuantities[month][item];
+    let minQuantity = Infinity;
+    let maxQuantity = -Infinity;
+    let sum = 0;
+    let count = 0;
+
+    for (const qty of quantities) {
+      if (qty < minQuantity) {
+        minQuantity = qty;
+      }
+      if (qty > maxQuantity) {
+        maxQuantity = qty;
+      }
+      sum += qty;
+      count++;
+    }
+
+    const avgQuantity = sum / count;
+
+    result[month] = {
+      item: item,
+      minOrders: minQuantity,
+      maxOrders: maxQuantity,
+      avgOrders: avgQuantity,
+    };
   }
 
-  res.json(mostPopularItemStats);
+  res.json(result);
 });
 
 app.get("/", (req, resp) => {
