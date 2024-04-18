@@ -41,8 +41,8 @@ This API provides endpoints to analyze ice cream sales data. It includes functio
 
 ## Deployment
 
-The API's are deployed at [Data Analyzer API's](https://data-analyzer-28a33d21fbe6.herokuapp.com/)
-This project is deployed and accessible at [Data Analyzer](https://data-analyzer-ui-c275ac72c028.herokuapp.com/).
+- The API's are deployed at [Data Analyzer API's](https://data-analyzer-28a33d21fbe6.herokuapp.com/)
+- The complete project is deployed and accessible at [Data Analyzer](https://data-analyzer-ui-c275ac72c028.herokuapp.com/).
 
 ## Usage
 
